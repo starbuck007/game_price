@@ -18,7 +18,7 @@ def db_connect():
 def find_appid(appid):
     id = False
     con, cur = db_connect()
-    res = cur.execute("SELECT `id` FROM `games` WHERE `appid` = %s", appid)
+    res = cur.execute("SELECT `id` FROM `game` WHERE `appid` = %s", appid)
     if res:
         row = cur.fetchone()
         id = row['id']
@@ -30,7 +30,7 @@ def insert_appid(game):
     con, cur = db_connect()
     if find_appid(game['appid']):
         return False
-    cur.execute("INSERT INTO `games` (`appid`, `name`) VALUES (%s, %s)",
+    cur.execute("INSERT INTO `game` (`appid`, `name`) VALUES (%s, %s)",
                 (game['appid'], game['name']))
     id = con.insert_id()
     con.commit()
