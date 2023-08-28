@@ -1,23 +1,11 @@
 import requests
-import configparser
-import pymysql
 
-
-def db_connect():
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    con = pymysql.connect(host = config.get('db_local', 'host'),
-                            user=config.get('db_local', 'user'),
-                            password=config.get('db_local', 'password'),
-                            db=config.get('db_local', 'db'),
-                            cursorclass=pymysql.cursors.DictCursor)
-    cur = con.cursor()
-    return con, cur
+from modules import db_connect as db
 
 
 def find_appid(appid):
     id = False
-    con, cur = db_connect()
+    con, cur = db.connect()
     res = cur.execute("SELECT `id` FROM `game` WHERE `appid` = %s", appid)
     if res:
         row = cur.fetchone()
@@ -27,7 +15,7 @@ def find_appid(appid):
 
 
 def insert_appid(game):
-    con, cur = db_connect()
+    con, cur = db.connect()
     if find_appid(game['appid']):
         return False
     cur.execute("INSERT INTO `game` (`appid`, `name`) VALUES (%s, %s)",
