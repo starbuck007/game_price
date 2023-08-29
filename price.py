@@ -33,17 +33,37 @@ def escape_special_characters(string):
     return escaped_string
 
 
-country_name = input().strip().lower()
+country_name = input('Введите название страны: ').strip().lower()
 country_code = find_country_code(country_name)
 
 
-game_name = input().strip().lower()
+game_name = input('Введите название игры: ').strip().lower()
 app_ids = find_appid(game_name)
 
-if not app_ids:
-    print('Игра не найдена')
+request_appid_list = []
+if app_ids:
+    for app_id in app_ids:
+        request_appid_list.append(app_id['appid'])
 else:
-    pass
+        print('Игра не найдена')
+        exit()
 
 
-# url = f'https://store.steampowered.com/api/appdetails?appids={appid}&cc={country_code}&filters=price_overview'
+request_appid = ','.join(request_appid_list)
+
+
+url = f'https://store.steampowered.com/api/appdetails?appids={request_appid}&cc={country_code}&filters=price_overview'
+
+
+prices = requests.get(url).json()
+print(prices)
+
+
+for price in prices:
+    if prices[price]['success']:
+        if prices[price]['data']['price_overview']['discount_percent'] > 0:
+            print(price, 'Цена со скидкой:', prices[price]['data']['price_overview']['final_formatted'], 'Скидка:', prices[price]['data']['price_overview']['discount_percent'], 'Цена:', prices[price]['data']['price_overview']['initial_formatted'])
+        else:
+            print(price, prices[price]['data']['price_overview']['final_formatted'])
+    else:
+        print(price, prices[price])
