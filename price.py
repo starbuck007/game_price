@@ -33,6 +33,15 @@ def escape_special_characters(string):
     return escaped_string
 
 
+def get_game_name(appid):
+    con, cur = db.connect()
+    res = cur.execute("SELECT `name` FROM `game` WHERE `appid` = %s", appid)
+    if res:
+        row = cur.fetchone()
+    con.close()
+    return row['name']
+
+
 country_name = input('Введите название страны: ').strip().lower()
 country_code = find_country_code(country_name)
 
@@ -56,14 +65,14 @@ url = f'https://store.steampowered.com/api/appdetails?appids={request_appid}&cc=
 
 
 prices = requests.get(url).json()
-print(prices)
 
 
 for price in prices:
+    title = get_game_name(price)
     if prices[price]['success']:
         if prices[price]['data']['price_overview']['discount_percent'] > 0:
-            print(price, 'Цена со скидкой:', prices[price]['data']['price_overview']['final_formatted'], 'Скидка:', prices[price]['data']['price_overview']['discount_percent'], 'Цена:', prices[price]['data']['price_overview']['initial_formatted'])
+            print(title, 'Цена со скидкой:', prices[price]['data']['price_overview']['final_formatted'], 'Скидка:', prices[price]['data']['price_overview']['discount_percent'], 'Цена:', prices[price]['data']['price_overview']['initial_formatted'])
         else:
-            print(price, prices[price]['data']['price_overview']['final_formatted'])
+            print(title, prices[price]['data']['price_overview']['final_formatted'])
     else:
-        print(price, prices[price])
+        print(f'Игра "{title}" недоступна в вашем регионе')
