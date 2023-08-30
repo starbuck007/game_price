@@ -78,4 +78,4 @@ for price in prices:
         print('что-то пошло не так')
         err = []
         with open('log.txt', 'a+') as f:
-            f.write(f'{country_name},{price}')
+            f.write(f'{country_name},{price}\n')
