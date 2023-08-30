@@ -1,7 +1,6 @@
 import requests
 import re
 
-
 from modules import db_connect as db
 
 
@@ -45,7 +44,6 @@ def get_game_name(appid):
 country_name = input('Введите название страны: ').strip().lower()
 country_code = find_country_code(country_name)
 
-
 game_name = input('Введите название игры: ').strip().lower()
 app_ids = find_appid(game_name)
 
@@ -54,25 +52,30 @@ if app_ids:
     for app_id in app_ids:
         request_appid_list.append(app_id['appid'])
 else:
-        print('Игра не найдена')
-        exit()
-
+    print('Игра не найдена')
+    exit()
 
 request_appid = ','.join(request_appid_list)
 
-
 url = f'https://store.steampowered.com/api/appdetails?appids={request_appid}&cc={country_code}&filters=price_overview'
-
 
 prices = requests.get(url).json()
 
-
 for price in prices:
     title = get_game_name(price)
-    if prices[price]['success']:
-        if prices[price]['data']['price_overview']['discount_percent'] > 0:
-            print(title, 'Цена со скидкой:', prices[price]['data']['price_overview']['final_formatted'], 'Скидка:', prices[price]['data']['price_overview']['discount_percent'], 'Цена:', prices[price]['data']['price_overview']['initial_formatted'])
+    try:
+        if prices[price]['success']:
+            if prices[price]['data']['price_overview']['discount_percent'] > 0:
+                print(title, 'Цена со скидкой:', prices[price]['data']['price_overview']['final_formatted'], 'Скидка:',
+                      prices[price]['data']['price_overview']['discount_percent'], 'Цена:',
+                      prices[price]['data']['price_overview']['initial_formatted'])
+            else:
+                print(title, prices[price]['data']['price_overview']['final_formatted'])
         else:
-            print(title, prices[price]['data']['price_overview']['final_formatted'])
-    else:
-        print(f'Игра "{title}" недоступна в вашем регионе')
+            print(f'"{title}" недоступна в вашем регионе')
+
+    except:
+        print('что-то пошло не так')
+        err = []
+        with open('log.txt', 'a+') as f:
+            f.write(f'{country_name},{price}')
