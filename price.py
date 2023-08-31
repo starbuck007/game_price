@@ -65,12 +65,16 @@ for price in prices:
     title = get_game_name(price)
     try:
         if prices[price]['success']:
-            if prices[price]['data']['price_overview']['discount_percent'] > 0:
-                print(title, 'Цена со скидкой:', prices[price]['data']['price_overview']['final_formatted'], 'Скидка:',
-                      prices[price]['data']['price_overview']['discount_percent'], 'Цена:',
-                      prices[price]['data']['price_overview']['initial_formatted'])
+            if prices[price]['data']:
+                if prices[price]['data']['price_overview']['discount_percent'] > 0:
+                    print(title, 'Цена со скидкой:', prices[price]['data']['price_overview']['final_formatted'],
+                          'Скидка:',
+                          prices[price]['data']['price_overview']['discount_percent'], 'Цена:',
+                          prices[price]['data']['price_overview']['initial_formatted'])
+                else:
+                    print(title, prices[price]['data']['price_overview']['final_formatted'])
             else:
-                print(title, prices[price]['data']['price_overview']['final_formatted'])
+                print(f'"{title}" недоступна в вашем регионе')
         else:
             print(f'"{title}" недоступна в вашем регионе')
 
